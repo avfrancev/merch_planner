@@ -3,7 +3,7 @@
   :class="[canDrop ? '':'no-drop']"
   )
   .carousel-item.rounded.flex.flex-col.flex-1.min-w-52.border-2.box-border(
-    v-for="d,i in kmean.groupedAddressesByDays.value"
+    v-for="d,i in addressesGroupedByDays"
     :class="[currDay == i ? 'border-accent':'border-neutral']"
     :style="{ borderColor: colors[currDay == i ? currDay : -1] }"
     class=""
@@ -15,7 +15,7 @@
       span Точек: {{ d.length }}
     .divider.divider-neutral.my-0.h-0
     draggable.my-2(
-      v-model="kmean.groupedAddressesByDays.value[i]"
+      v-model="addressesGroupedByDays[i]"
       v-bind="dragOptions"
       itemKey="address"
       tag="ul"
@@ -54,7 +54,7 @@ import draggable from "vuedraggable"
 
 const props = defineProps({
   addresses: Array,
-  kmean: Object,
+  addressesGroupedByDays: Object,
   canDrop: Boolean,
   currDay: Number,
   colors: Array,
@@ -62,12 +62,14 @@ const props = defineProps({
   isDragging: Boolean,
 })
 
-const { addresses, kmean, currDay, colors, days } = props
+const { currDay, colors, days, addressesGroupedByDays } = toRefs(props)
+const { addresses } = props
+
 
 // const emits = defineEmits(['update:isDragging', 'update:canDrop'])
 // const isDragging = useVModel(props, 'isDragging', emits)
 // const canDrop = useVModel(props, 'canDrop', emits)
-const isDragging = ref(true)
+const isDragging = ref(false)
 const canDrop = ref(true)
 
 

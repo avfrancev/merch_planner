@@ -69,60 +69,12 @@ export default (addresses) => {
   };
 
   ///////////////////////////////////////
-  const { centroids } = kMeanClustering(addresses, 5);
+  // const { centroids } = kMeanClustering(addresses, 5);
   
-  // Distribute addresses evenly across days based on cluster.
-  // visit frequency means how many times address is visited in a week.
-
-  // addresses.forEach(address => {
-  //   // Initialize an array to hold day assignments
-  //   address.days = [];
-  //   let visitFrequency = address.visit_frequency;
-  //   let assignedCluster = address.cluster;
-
-  //   // Assign the first day to the closest cluster
-  //   address.days.push(assignedCluster);
-
-  //   // If address is visited multiple days, assign to the next closest centroid
-  //   while (--visitFrequency > 0) {
-  //     // Calculate distances to each centroid
-  //     let distances = centroids.map((centroid, index) => ({
-  //       index: index,
-  //       distance: distance(address, centroid)
-  //     }));
-
-  //     // Sort distances in ascending order
-  //     distances.sort((a, b) => a.distance - b.distance);
-
-  //     // Find the next closest centroid that is not the same as the assigned cluster
-  //     let nextClosest = distances.find(d => d.index !== assignedCluster);
-
-  //     // Assign the next closest day, if available
-  //     if (nextClosest) {
-  //       address.days.push(nextClosest.index);
-  //       assignedCluster = nextClosest.index; // Update the assigned cluster
-  //     } else {
-  //       break; // No other centroids to assign, end the loop
-  //     }
-  //   }
-  // });
-
-  // console.log(addresses);
-
-  // console.log(groupSort(
-    //   addresses,
-  //   (a,b) => {
-  //     console.log(a.length, b.length)
-  //     // return D.length
-  //     return a,length - b.length
-  //   },
-  //   // (a, b) => a[1].length - b[1].length,
-  //   (address) => address.cluster));
-
   // Each address have visit frequency per week property and cluster property. I want to distribute addresses along a week to days group based on cluster and visit frequency.
-  function isAddressInGroup(address, G) {
-    return G.some(addressInGroup => addressInGroup === address);
-  }
+  // function isAddressInGroup(address, G) {
+  //   return G.some(addressInGroup => addressInGroup === address);
+  // }
 
   function getNextMinimalGroupByAddress(addresses) {
     const groupedAddressesByCluster = groups(addresses, address => address.cluster)
@@ -154,38 +106,38 @@ export default (addresses) => {
 
   const clusteredAddresses = kMeanClustering(distributedAddresses.flat(), 5);
 
-// Loop through each address in the addresses array
-addresses.forEach(address => {
-  // Initialize the days array for the current address
-  address.days = [];
-  // Get the visit frequency and assigned cluster for the address
-  let visitFrequency = address.visit_frequency;
-  let assignedCluster = address.cluster;
-  // Add the assigned cluster to the days array
-  address.days.push(assignedCluster);
-  
-  // Group the addresses by cluster
-  const groupedAddressesByCluster = groups(addresses, address => address.cluster);
-  // Sort the grouped addresses by cluster based on the number of addresses in each group
-  const sortedGroupedAddressesByCluster = groupedAddressesByCluster.sort((a, b) => a[1].length - b[1].length);
-  // Get the ID of the group with the minimal number of addresses
-  let minimalGroupID = sortedGroupedAddressesByCluster[0][0];
+  // Loop through each address in the addresses array
+  addresses.forEach(address => {
+    // Initialize the days array for the current address
+    address.days = [];
+    // Get the visit frequency and assigned cluster for the address
+    let visitFrequency = address.visit_frequency;
+    let assignedCluster = address.cluster;
+    // Add the assigned cluster to the days array
+    address.days.push(assignedCluster);
+    
+    // Group the addresses by cluster
+    const groupedAddressesByCluster = groups(addresses, address => address.cluster);
+    // Sort the grouped addresses by cluster based on the number of addresses in each group
+    const sortedGroupedAddressesByCluster = groupedAddressesByCluster.sort((a, b) => a[1].length - b[1].length);
+    // Get the ID of the group with the minimal number of addresses
+    let minimalGroupID = sortedGroupedAddressesByCluster[0][0];
 
-  // Iterate from 1 to visitFrequency
-  for (let i = 1; i < visitFrequency; i++) {
-    // Check if the minimalGroupID % 5 is already in the days array for the address
-    const isAddressInDays = address.days.includes(minimalGroupID % 5);
-    // If it's not in the days array, add it
-    if (!isAddressInDays)
-      address.days.push(minimalGroupID % 5);
-    // If it's already in the days array, increment minimalGroupID and add the new value to the days array
-    else {
-      address.days.push(++minimalGroupID % 5);
+    // Iterate from 1 to visitFrequency
+    for (let i = 1; i < visitFrequency; i++) {
+      // Check if the minimalGroupID % 5 is already in the days array for the address
+      const isAddressInDays = address.days.includes(minimalGroupID % 5);
+      // If it's not in the days array, add it
+      if (!isAddressInDays)
+        address.days.push(minimalGroupID % 5);
+      // If it's already in the days array, increment minimalGroupID and add the new value to the days array
+      else {
+        address.days.push(++minimalGroupID % 5);
+      }
     }
-  }
-});
+  });
 
-  const groupedAddressesByDays = ref(addresses.reduce((groups, address) => {
+  const addressesGroupedByDays = ref(addresses.reduce((groups, address) => {
     let days = address.days
     // console.log(address);
     days.forEach((day, i) => {
@@ -200,18 +152,9 @@ addresses.forEach(address => {
     return groups;
   }, {}))
 
-  //   // console.log(addresses)
-  //   return
 
-  // }
-  // updateCentroids(centroids, addresses)
-  // updatePoints(data)
   return {
-    // centroids: clusteredData.centroids,
-    // updatePoints,
-    // updateCentroids,
-    // updateKMean: update,
-    // groupedAddressesByDays: g,
-    groupedAddressesByDays
+    centroids,
+    addressesGroupedByDays
   }
 }
