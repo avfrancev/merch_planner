@@ -17,11 +17,17 @@ const hello = ref()
 
 
 
-<style scoped lang="sass">
-html
+<style lang="sass">
+html, body
   scroll-behavior: smooth
+  height: 100%
+  display: grid
+</style>
+
+<style lang="sass">
 #app
-  overflow: auto
+  // overflow-x: hidden
   position: relative
-  height: 100vh
+  width: 100%
+  // height: 100vh
 </style>

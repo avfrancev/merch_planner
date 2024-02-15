@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { interpolateRainbow } from 'd3-scale-chromatic'
 import { groups, sort, groupSort } from 'd3-array'
 
-import SAMPLE_DATA_1 from 'src/sample_data/addresses2.json'
+import SAMPLE_DATA_1 from 'src/sample_data/addresses.json'
+import SAMPLE_DATA_2 from 'src/sample_data/addresses2.json'
 
 const distance = (a, b) => {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
@@ -87,6 +88,20 @@ function distributeAddressesByDays(addresses) {
   });
 }
 
+function groupAddressesByDays(addresses) {
+  return addresses.reduce((groups, address) => {
+    let days = address.days
+    days.forEach((day, i) => {
+      if (!groups[day]) {
+        groups[day] = [];
+      }
+      address.iid = `${address.address}_${days[i]}`
+      groups[day].push(address);
+    })
+    return groups;
+  }, {})
+}
+
 
 export const useAddressesStore = defineStore('addresses', () => {
   const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт']; 
@@ -97,19 +112,23 @@ export const useAddressesStore = defineStore('addresses', () => {
   const addresses = reactive([])
   const centroids = ref([])
 
-  const addressesGroupedByDays = computed(() => {
-    return addresses.reduce((groups, address) => {
-      let days = address.days
-      days.forEach((day, i) => {
-        if (!groups[day]) {
-          groups[day] = [];
-        }
-        address.iid = `${address.address}_${days[i]}`
-        groups[day].push(address);
-      })
-      return groups;
-    }, {})
-  })
+  const addressesGroupedByDays = ref([])
+  // const addressesGroupedByDays = computed(() => {
+  //   console.log('-----');
+  //   return addresses.reduce((groups, address) => {
+  //     let days = address.days
+  //     days.forEach((day, i) => {
+  //       if (!groups[day]) {
+  //         groups[day] = [];
+  //       }
+  //       address.iid = `${address.address}_${days[i]}`
+  //       groups[day].push(address);
+  //     })
+  //     return groups;
+  //   }, {})
+  // })
+
+
 
   function updateAddresses(data) {
     addresses.splice(0, addresses.length, ...data)
@@ -152,6 +171,7 @@ export const useAddressesStore = defineStore('addresses', () => {
 
     distributeAddressesByDays(addresses)
     
+    addressesGroupedByDays.value = groupAddressesByDays(addresses)
   }
 
 

@@ -1,19 +1,33 @@
 <template lang="pug">
-.carousel.w-full.box-border.space-x-4.justify-stretch.mt-6.mb-6(
+pre table view
+table.table.table-xs.-z-10
+  thead
+    tr
+      td Store
+      td Address
+      td(v-for="d in days") {{ d }}
+  tbody
+    tr(v-for="addr,i in addresses")
+      td {{ addr.store }}
+      td {{ addr.address }}
+      td(
+        @click=""
+        v-for="d,i in days") {{ addr.days.includes(i) ? '1':'' }}
+//- .carousel.w-full.box-border.space-x-4.justify-stretch.mt-6.mb-6(
   :class="[canDrop ? '':'no-drop']"
   )
   .carousel-item.rounded.flex.flex-col.flex-1.min-w-52.border-2.box-border(
     v-for="d,i in addressesGroupedByDays"
-    :class="[currDay == i ? 'border-accent':'border-base-300']"
+    :class="[currDay == i ? 'border-accent':'border-neutral']"
     :style="{ borderColor: colors[currDay == i ? currDay : -1] }"
     class=""
     )
-    .flex.items-baseline.justify-between.space-x-2.px-4.py-4.border-b-2.border-base-300
+    .flex.items-baseline.justify-between.space-x-2.px-4.py-4
       .flex.items-center
         .inline-block.rounded-full.h-4.w-4.mr-2(:style="{ background: colors[i] }") 
         .font-bold.text-xl.uppercase {{days[i]}}
       span Точек: {{ d.length }}
-    //- .divider.divider-success.my-0.h-0
+    .divider.divider-neutral.my-0.h-0
     draggable.my-2.h-full(
       v-model="addressesGroupedByDays[i]"
       v-bind="dragOptions"
@@ -78,7 +92,7 @@ const dragOptions = {
           group: "description",
           disabled: false,
           forceFallback: true,
-          ghostClass: "ghost",
+          ghostClass: "ghost"
         };
 
 

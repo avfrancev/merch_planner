@@ -1,21 +1,45 @@
 <template lang="pug">
-.container.mx-auto.px-2.text-xs
-  #top.flex.space-x-2.my-4
-    FileInput(v-bind="updateAddresses")
-    button.btn.btn-error(@click="exportFile") Export
-    .join
+div.relative.h-full(v-if="addresses.length <= 0")
+  .flex.items-center.justify-center.h-full.flex.flex-col
+    button.btn.btn-primary(@click="loadSampleData") loadSampleData
+    .divider OR
+    FileInput(v-bind="{updateAddresses, addresses}")
+
+.container.mx-auto.px-2.text-xs(v-else)
+  #top.flex.space-x-2.my-4.justify-stretch.carousel
+    
+    .carousel-item(v-if="addresses.length > 0")
+      FileInput(v-bind="{updateAddresses, addresses}")
+      //- button.btn.btn-error(@click="exportFile") Export
+    .flex-1
+    .carousel-item.join.ml-auto
       button.join-item.btn(:class="[ currDay === -1 ? 'btn-active':'']" @click="currDay = -1") Все
       button.join-item.btn(v-for="d,i in days" :class="[ currDay === i ? 'btn-active':'']"
         :style="`background: ${currDay === i ? colors[i]:''}; color: ${currDay === i ? 'black':'white'}`"
         @click="currDay = i") {{ d }}
+    
+    .carousel-item.join
+      button.join-item.btn(
+        @click="activeDaysCardView = true"
+        :class="[ currDay === -1 ? 'btn-active':'']"
+        ) 1
+      button.join-item.btn(
+        @click="activeDaysCardView = false"
+        ) 2
 
-  div.relative(v-if="addresses.length <= 0")
-    span UPS...
-  div.relative(v-else)
+
+    //- button.btn.btn-error(@click="exportFile") Export
+
+  div.relative.grid
     .w-full.rounded.overflow-hidden.sticky.top-0(:class="[isMapExpanded ? 'h-screen':'h-[40svh]']")
       YaMap(v-bind="{ addresses }")
-            
-    DaysCardView(v-bind="{ addresses, currDay, colors, days, addressesGroupedByDays }")
+    
+    DaysCardView(
+      v-if="activeDaysCardView"
+      v-bind="{ addresses, currDay, colors, days, addressesGroupedByDays }")
+    DaysTableView(
+      v-else
+      v-bind="{ addresses, currDay, colors, days, addressesGroupedByDays }")
     
   
   </template>
@@ -35,6 +59,8 @@
   const fileData = ref([])
 
   const isMapExpanded = ref(false)
+
+  const activeDaysCardView = ref(true)
   
   // const kmean = useKMean(addresses)
   // kmean.updateKMean()
@@ -61,8 +87,6 @@
     } catch (error) {
       console.error('Error:', error);
     }
-  
-  
   }
   
   async function getGeocode(address) {
@@ -106,14 +130,14 @@
         console.log(i);
       }
   
-      let o = []
-      o = addresses.map((d) => {
-        let { store, address, ya, visit_frequency, cluster, day, x, y } = d
-        return {
-          store, address, ya, visit_frequency, cluster, day, x, y
-        }
-      })
-      console.log(o);
+      // let o = []
+      // o = addresses.map((d) => {
+      //   let { store, address, ya, visit_frequency, cluster, day, x, y } = d
+      //   return {
+      //     store, address, ya, visit_frequency, cluster, day, x, y
+      //   }
+      // })
+      // console.log(o);
     // console.log(toRaw(addresses));
     // console.log(JSON.stringify((addresses), null, 2));
   
