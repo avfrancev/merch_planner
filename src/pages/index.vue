@@ -6,11 +6,10 @@ div.relative.h-full(v-if="addresses.length <= 0")
     FileInput(v-bind="{updateAddresses, addresses}")
 
 .container.mx-auto.px-2.text-xs(v-else)
-  #top.flex.space-x-2.my-4.justify-stretch.carousel
-    
-    .carousel-item(v-if="addresses.length > 0")
+  #top.flex.space-x-4.my-4.justify-stretch.carousel
+    .carousel-item.space-x-4(v-if="!fileStore.error")
       FileInput(v-bind="{updateAddresses, addresses}")
-      //- button.btn.btn-error(@click="exportFile") Export
+      button.btn.btn-secondary(@click="fileStore.exportFile") Export
     .flex-1
     .carousel-item.join.ml-auto
       button.join-item.btn(:class="[ currDay === -1 ? 'btn-active':'']" @click="currDay = -1") Все
@@ -21,20 +20,21 @@ div.relative.h-full(v-if="addresses.length <= 0")
     .carousel-item.join
       button.join-item.btn.btn-square(
         @click="activeDaysCardView = true"
-        :class="[ activeDaysCardView ? 'btn-active':'']"
+        :class="[ activeDaysCardView ? 'btn-active btn-secondary':'']"
         )
         i-ic:outline-view-week.text-2xl
-      button.join-item.btn(
+      button.join-item.btn.btn-square(
         @click="activeDaysCardView = false"
-        :class="[ !activeDaysCardView ? 'btn-active':'']"
+        :class="[ !activeDaysCardView ? 'btn-active btn-secondary':'']"
         )
         i-ic:outline-view-list.text-2xl
 
-
-    //- button.btn.btn-error(@click="exportFile") Export
+    button.carousel-item.btn.btn-square(@click="isMapExpanded = !isMapExpanded")
+      i-ic:outline-expand-more.text-2xl(v-if="!isMapExpanded")
+      i-ic:outline-expand-less.text-2xl(v-if="isMapExpanded")
 
   div.relative.grid
-    .w-full.rounded.overflow-hidden.sticky.top-0(:class="[isMapExpanded ? 'h-screen':'h-[40svh]']")
+    .w-full.rounded.overflow-hidden.sticky.top-0(:class="[isMapExpanded ? 'h-[90svh]':'h-[40svh]']")
       YaMap(v-bind="{ addresses }")
     
     DaysCardView(
@@ -48,198 +48,20 @@ div.relative.h-full(v-if="addresses.length <= 0")
   </template>
   
   <script setup>
-  // import useKMean from 'src/composables/kmean.js'
   import { storeToRefs } from 'pinia'
   import { useAddressesStore } from 'src/stores/addresses'
   
   const addressesStore = useAddressesStore()
   const { addresses, loadSampleData, colors, days, centroids, updateAddresses } = addressesStore
   const { currDay, addressesGroupedByDays } = storeToRefs(addressesStore)
-  // loadSampleData()
-  
-  // const addresses2 = reactive([])
-  // const addresses = reactive(aaa)
-  const fileData = ref([])
+
+  import { useFileStore } from 'src/stores/file'
+  const fileStore = useFileStore()
 
   const isMapExpanded = ref(false)
 
   const activeDaysCardView = ref(true)
-  
-  // const kmean = useKMean(addresses)
-  // kmean.updateKMean()
-  
-  
-  const clickGenPlan = () => {
-    Object.assign(plan, generatePlan(addresses))
-  }
-  
-  
-  
-  async function searchYandexMaps(str) {
-    const apiKey = '4e3567e5-9ea1-47ec-89d0-a09424478672'; // YANDEX API
-    const apiUrl = `https://search-maps.yandex.ru/v1/?type=geo&lang=Ru_RU&apikey=4e3567e5-9ea1-47ec-89d0-a09424478672&text=${str}`
-  
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        console.log(data);
-        // if (data && data.response) {
-          // geocode = data.response
-        // }
-        return data
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-  
-  async function getGeocode(address) {
-    // const apiKey = 'a0212be8-caa5-4f01-8dc3-9ec59a4348bb'; // YANDEX API
-    // const apiUrl = `https://geocode-maps.yandex.ru/1.x/?apikey=${apiKey}&format=json&geocode=`;
-    // const apiUrl = `https://search-maps.yandex.ru/1.x/?apikey=${apiKey}&format=json&text=`;
-    // const apiUrl = `https://search-maps.yandex.ru/v1/?text=Bank Alfalah&type=biz&lang=en_US&apikey=${apiKey}`
-                    // https://search-maps.yandex.ru/v1/?text=Bank%20Alfalah&type=biz&lang=en_US&apikey=4e3567e5-9ea1-47ec-89d0-a09424478672
-    let geocode = null;
-  
-    try {
-        const response = await fetch(`${apiUrl}${encodeURIComponent(address)}`);
-        const data = await response.json();
-        console.log(data);
-        if (data && data.response) {
-          geocode = data.response
-        }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  
-    return geocode;
-  }
-  
-  
-  
-  const locateAddress = async (el) => {
-    let res = await searchYandexMaps(`Москва, ${el.address}`)
-    // console.log({res}, `${el.store} ${el.address}`);
-    // el.geocode = res.GeoObjectCollection.featureMember[0].GeoObject
-    el.ya = res.features[0]  
-  }
-  
-  
-  async function fillCoordinates() {
-    // for (const item of addresses.slice(0, 3)) {
-      console.log('-------------', addresses.length);
-      for (const [i, item] of addresses.entries()) {
-        await locateAddress(item)
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        console.log(i);
-      }
-  
-      // let o = []
-      // o = addresses.map((d) => {
-      //   let { store, address, ya, visit_frequency, cluster, day, x, y } = d
-      //   return {
-      //     store, address, ya, visit_frequency, cluster, day, x, y
-      //   }
-      // })
-      // console.log(o);
-    // console.log(toRaw(addresses));
-    // console.log(JSON.stringify((addresses), null, 2));
-  
-  }
-  
-  // watch(plan, (newVal, oldVal) => {
-  //   // mmm.value = newVal
-  //   console.log(newVal, oldVal);
-  // })
-  
-  // function handleDayChange(e) {
-  //   console.log(e);
-  //   if (e.added) {
-  //     addresses.forEach((d) => {
-  
-  //     })
-  //   }
-  // }
 
-  
-  // function handleMove(e) {
-  //   const list = e.relatedContext.list
-  //   const el = e.draggedContext.element
-  //   let fromDay = +e.from.dataset.dayId
-  //   let toDay = +e.to.dataset.dayId
-  //   // console.log(e);
-  //   canDrop = true
-  //   if (fromDay !== toDay && list.includes(el)) {
-  //     // e.originalEvent.target.classList.add('no-drop');
-  //     canDrop = false
-  //     return false;
-  //   }
-  //   return true
-  // }
-
-  // function handleDropEnd(e, ee) {
-  //   isDragging.value = false
-  //   let fromDay = +e.from.dataset.dayId
-  //   let toDay = +e.to.dataset.dayId
-  //   // console.log({fromId, toId});
-  //   canDrop = true
-
-  //   let a = addresses.find(el => el.iid === e.item.id)
-  //   if (a) {
-  //     // console.log(fromId);
-  //     let fromDayId = a.days.indexOf(fromDay)
-  //     // toDayId = a.days.indexOf(toDay)
-  //     a.days[fromDayId] = toDay
-  //     onAddrPointerEnter(a)
-  //     // a.days.splice(fromDayId, 1)
-  //     // a.days.splice(toDayId, 0, fromDay)
-      
-  //   }
-  //   // console.log(e.item.id);
-  // }
-  
-  
-  
-  
-  // function handleDayChange__(e) {
-  //   if (e.added) {
-  //     // let id = addresses.indexOf(e.added.element)
-  //     nextTick(() => {
-  //       let newGroupId = 0
-  //       for (let i = 0; i < plan.length; i++) {
-  //         // const element = plan[i];
-  //         const isExist = plan[i].includes(e.added.element)
-  //         if (isExist)
-  //           newGroupId = i
-  //       }
-  //       console.log(e.added, newGroupId)
-  //       e.added.element.day = newGroupId
-  //     })
-  //     // let id2 = plan.flat().indexOf(e.added.element)
-  //     // console.log(addresses[id], id,id2);
-  //     // console.log(plan[id2], id,id2);
-  //     // e.added.element.day = e.added.newIndex
-  //   }
-  // }
-  
-  // function scrollToAddr(addr) {
-  //   // addresses.forEach((a) => a.hovered = false)
-  //   // addr.hovered = true
-  //   addr.li.scrollIntoView({ behavior: 'smooth' })
-  // }
-  
-  // function onAddrPointerEnter(addr) {
-  //   // console.log(addr);
-  //   addresses.forEach((a) => a.isHovered = false)
-  //   if (!isDragging.value)
-  //     addr.isHovered = true
-  // }
-  
-  // function onAddrOver(addr) {
-  //   // console.log(addr)
-  //   addresses.forEach((a) => a.isHovered = false)
-  //   addr.isHovered = true
-  // }
-  
 
   </script>
   

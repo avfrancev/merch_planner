@@ -7,6 +7,7 @@ import Pages from 'vite-plugin-pages'
 import Icons from 'unplugin-icons/vite'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 import IconsResolver from 'unplugin-icons/resolver'
+import { splitVendorChunkPlugin } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,6 +17,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    splitVendorChunkPlugin(),
     vue(),
     Components({
       extensions: ['vue', 'md', 'js'],

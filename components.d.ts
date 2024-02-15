@@ -10,9 +10,13 @@ declare module 'vue' {
     DaysCardView: typeof import('./src/components/DaysCardView.vue')['default']
     DaysTableView: typeof import('./src/components/DaysTableView.vue')['default']
     FileInput: typeof import('./src/components/FileInput.vue')['default']
-    FileLoader: typeof import('./src/components/FileLoader.vue')['default']
+    'IIc:outlineExpandLess': typeof import('~icons/ic/outline-expand-less')['default']
+    'IIc:outlineExpandMore': typeof import('~icons/ic/outline-expand-more')['default']
+    'IIc:outlineViewList': typeof import('~icons/ic/outline-view-list')['default']
+    'IIc:outlineViewWeek': typeof import('~icons/ic/outline-view-week')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Shader2d: typeof import('./src/components/shader-2d.vue')['default']
     YaMap: typeof import('./src/components/YaMap.vue')['default']
   }
 }
