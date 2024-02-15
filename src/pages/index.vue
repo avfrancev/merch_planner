@@ -19,13 +19,16 @@ div.relative.h-full(v-if="addresses.length <= 0")
         @click="currDay = i") {{ d }}
     
     .carousel-item.join
-      button.join-item.btn(
+      button.join-item.btn.btn-square(
         @click="activeDaysCardView = true"
-        :class="[ currDay === -1 ? 'btn-active':'']"
-        ) 1
+        :class="[ activeDaysCardView ? 'btn-active':'']"
+        )
+        i-ic:outline-view-week.text-2xl
       button.join-item.btn(
         @click="activeDaysCardView = false"
-        ) 2
+        :class="[ !activeDaysCardView ? 'btn-active':'']"
+        )
+        i-ic:outline-view-list.text-2xl
 
 
     //- button.btn.btn-error(@click="exportFile") Export
