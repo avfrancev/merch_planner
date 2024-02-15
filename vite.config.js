@@ -11,6 +11,7 @@ import { splitVendorChunkPlugin } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/merch_planner/',
   resolve: {
     alias: {
       src: "/src",
